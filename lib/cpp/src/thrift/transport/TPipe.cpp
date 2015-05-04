@@ -262,13 +262,13 @@ void TPipe::open() {
   TAutoHandle hPipe;
   do {
     DWORD flags = FILE_FLAG_OVERLAPPED; // async mode, so we can do reads at the same time as writes
-    hPipe.reset(CreateFile(pipename_.c_str(),
-                           GENERIC_READ | GENERIC_WRITE,
-                           0,             // no sharing
-                           NULL,          // default security attributes
-                           OPEN_EXISTING, // opens existing pipe
-                           flags,
-                           NULL)); // no template file
+    hPipe.reset(CreateFileA(pipename_.c_str(),
+                            GENERIC_READ | GENERIC_WRITE,
+                            0,             // no sharing
+                            NULL,          // default security attributes
+                            OPEN_EXISTING, // opens existing pipe
+                            flags,
+                            NULL)); // no template file
 
     if (hPipe.h != INVALID_HANDLE_VALUE)
       break; // success!
@@ -277,7 +277,7 @@ void TPipe::open() {
       GlobalOutput.perror("TPipe::open ::CreateFile errored GLE=", ::GetLastError());
       throw TTransportException(TTransportException::NOT_OPEN, "Unable to open pipe");
     }
-  } while (::WaitNamedPipe(pipename_.c_str(), TimeoutSeconds_ * 1000));
+  } while (::WaitNamedPipeA(pipename_.c_str(), TimeoutSeconds_ * 1000));
 
   if (hPipe.h == INVALID_HANDLE_VALUE) {
     GlobalOutput.perror("TPipe::open ::CreateFile errored GLE=", ::GetLastError());

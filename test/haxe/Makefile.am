@@ -17,7 +17,7 @@
 # under the License.
 #
 
-THRIFT = $(top_srcdir)/compiler/cpp/thrift
+THRIFT = $(top_builddir)/compiler/cpp/thrift
 THRIFTCMD = $(THRIFT) --gen haxe -r
 THRIFTTEST = $(top_srcdir)/test/ThriftTest.thrift
 
@@ -46,9 +46,10 @@ clean-local:
 	$(RM) -r gen-haxe bin
 
 check: $(BIN_CPP)
-	timeout 120 $(BIN_CPP) server &
+	timeout 10 $(BIN_CPP) server &
 	sleep 1
 	$(BIN_CPP) client
+	sleep 10
 
 EXTRA_DIST = \
              src \

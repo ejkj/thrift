@@ -155,8 +155,11 @@ private:
   /// Server socket file descriptor
   THRIFT_SOCKET serverSocket_;
 
-  /// Port server runs on
+  /// Port server runs on. Zero when letting OS decide actual port
   int port_;
+
+  /// Port server actually runs on
+  int listenPort_;
 
   /// The optional user-provided event-base (for single-thread servers)
   event_base* userEventBase_;
@@ -280,6 +283,7 @@ private:
     nextIOThread_ = 0;
     useHighPriorityIOThreads_ = false;
     port_ = port;
+    listenPort_ = port;
     userEventBase_ = NULL;
     threadPoolProcessing_ = false;
     numTConnections_ = 0;
@@ -395,6 +399,8 @@ public:
 
   void setThreadManager(boost::shared_ptr<ThreadManager> threadManager);
 
+  int getListenPort() { return listenPort_; }
+
   boost::shared_ptr<ThreadManager> getThreadManager() { return threadManager_; }
 
   /**
@@ -403,7 +409,11 @@ public:
    * PosixThreadFactory for the IO worker threads, because they must joinable
    * for clean shutdown.
    */
-  void setNumIOThreads(size_t numThreads) { numIOThreads_ = numThreads; }
+  void setNumIOThreads(size_t numThreads) {
+    numIOThreads_ = numThreads;
+    // User-provided event-base doesn't works for multi-threaded servers
+    assert(numIOThreads_ <= 1 || !userEventBase_);
+  }
 
   /** Return whether the IO threads will get high scheduling priority */
   bool useHighPriorityIOThreads() const { return useHighPriorityIOThreads_; }

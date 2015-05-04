@@ -323,7 +323,7 @@ bool TNamedPipeServer::createNamedPipe() {
   ea.grfInheritance = NO_INHERITANCE;
   ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
   ea.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
-  ea.Trustee.ptstrName = (LPSTR)everyone_sid;
+  ea.Trustee.ptstrName = static_cast<LPTSTR>(everyone_sid);
 
   PACL acl = NULL;
   SetEntriesInAcl(1, &ea, NULL, &acl);
@@ -338,16 +338,16 @@ bool TNamedPipeServer::createNamedPipe() {
   sa.bInheritHandle = FALSE;
 
   // Create an instance of the named pipe
-  TAutoHandle hPipe(CreateNamedPipe(pipename_.c_str(),    // pipe name
-                                    PIPE_ACCESS_DUPLEX |  // read/write access
-                                    FILE_FLAG_OVERLAPPED, // async mode
-                                    PIPE_TYPE_BYTE |      // byte type pipe
-                                    PIPE_READMODE_BYTE,   // byte read mode
-                                    maxconns_,            // max. instances
-                                    bufsize_,             // output buffer size
-                                    bufsize_,             // input buffer size
-                                    0,                    // client time-out
-                                    &sa));                // security attributes
+  TAutoHandle hPipe(CreateNamedPipeA(pipename_.c_str(),    // pipe name
+                                     PIPE_ACCESS_DUPLEX |  // read/write access
+                                     FILE_FLAG_OVERLAPPED, // async mode
+                                     PIPE_TYPE_BYTE |      // byte type pipe
+                                     PIPE_READMODE_BYTE,   // byte read mode
+                                     maxconns_,            // max. instances
+                                     bufsize_,             // output buffer size
+                                     bufsize_,             // input buffer size
+                                     0,                    // client time-out
+                                     &sa));                // security attributes
 
   if (hPipe.h == INVALID_HANDLE_VALUE) {
     Pipe_.reset();

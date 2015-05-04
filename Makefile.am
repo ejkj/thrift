@@ -37,11 +37,25 @@ dist-hook:
 print-version:
 	@echo $(VERSION)
 
+.PHONY: precross cross
+precross-%: all
+	$(MAKE) -C $* precross
+precross: all precross-test precross-lib
 
-cross: check
-	sh test/test.sh
+# TODO: generate --server and --client switches from "--with(out)-..." build flags
+cross: precross
+	$(PYTHON) test/test.py -s
+
+TIMES = 1 2 3
+fail: precross
+	$(PYTHON) test/test.py || true
+	$(PYTHON) test/test.py --update-expected-failures=overwrite
+	$(foreach var,$(TIMES),test/test.py -s || true;test/test.py --update-expected-failures=merge;)
 
 codespell_skip_files = \
+	*.jar \
+	*.class \
+	*.so \
 	*.a \
 	*.la \
 	*.o \
@@ -72,9 +86,11 @@ EXTRA_DIST = \
 	bower.json \
 	composer.json \
 	contrib \
+	CONTRIBUTING.md \
 	debian \
 	doc \
 	doap.rdf \
+	package.json \
 	sonar-project.properties \
 	LICENSE \
 	CHANGES \

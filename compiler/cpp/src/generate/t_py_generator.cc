@@ -1413,7 +1413,7 @@ void t_py_generator::generate_service_remote(t_service* tservice) {
     t_struct* arg_struct = (*f_iter)->get_arglist();
     const std::vector<t_field*>& args = arg_struct->get_members();
     vector<t_field*>::const_iterator a_iter;
-    int num_args = args.size();
+    std::vector<t_field*>::size_type num_args = args.size();
     bool first = true;
     for (int i = 0; i < num_args; ++i) {
       if (first) {
@@ -1466,7 +1466,7 @@ void t_py_generator::generate_service_remote(t_service* tservice) {
     t_struct* arg_struct = (*f_iter)->get_arglist();
     const std::vector<t_field*>& args = arg_struct->get_members();
     vector<t_field*>::const_iterator a_iter;
-    int num_args = args.size();
+    std::vector<t_field*>::size_type num_args = args.size();
 
     f_remote << "if cmd == '" << (*f_iter)->get_name() << "':" << endl
              << "  if len(args) != " << num_args << ":" << endl << "    print('"
@@ -1701,7 +1701,7 @@ void t_py_generator::generate_process_function(t_service* tservice, t_function* 
       // Kinda absurd
       f_service_ << indent() << "  error.raiseException()" << endl;
       for (x_iter = xceptions.begin(); x_iter != xceptions.end(); ++x_iter) {
-        f_service_ << indent() << "except " << type_name((*x_iter)->get_type()) << ", "
+        f_service_ << indent() << "except " << type_name((*x_iter)->get_type()) << " as "
                    << (*x_iter)->get_name() << ":" << endl;
         if (!tfunction->is_oneway()) {
           indent_up();
@@ -1773,7 +1773,7 @@ void t_py_generator::generate_process_function(t_service* tservice, t_function* 
     if (!tfunction->is_oneway() && xceptions.size() > 0) {
       indent_down();
       for (x_iter = xceptions.begin(); x_iter != xceptions.end(); ++x_iter) {
-        f_service_ << indent() << "except " << type_name((*x_iter)->get_type()) << ", "
+        f_service_ << indent() << "except " << type_name((*x_iter)->get_type()) << " as "
                    << (*x_iter)->get_name() << ":" << endl;
         if (!tfunction->is_oneway()) {
           indent_up();
@@ -1828,7 +1828,7 @@ void t_py_generator::generate_process_function(t_service* tservice, t_function* 
     if (!tfunction->is_oneway() && xceptions.size() > 0) {
       indent_down();
       for (x_iter = xceptions.begin(); x_iter != xceptions.end(); ++x_iter) {
-        f_service_ << indent() << "except " << type_name((*x_iter)->get_type()) << ", "
+        f_service_ << indent() << "except " << type_name((*x_iter)->get_type()) << " as "
                    << (*x_iter)->get_name() << ":" << endl;
         if (!tfunction->is_oneway()) {
           indent_up();
